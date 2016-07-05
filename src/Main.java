@@ -7,6 +7,7 @@ public class Main {
     public static void main(String[] args){
         Screen someFrame = new Screen();
         GameStatus someStatus = new GameStatus();
+        someStatus.changeLevel(3);
         someFrame.makeScreen(someStatus.getGridX(), someStatus.getGridY());
     }
 
