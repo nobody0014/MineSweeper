@@ -20,7 +20,7 @@ public class Screen {
     private GridBagConstraints gameConstraint;
     private JMenuBar menuBar;
     private JMenu menu;
-    private Cell buttons[];
+    private Cell buttons[][];
 
     public void makeScreen(int x, int y){
         Toolkit tk =  Toolkit.getDefaultToolkit();
@@ -83,15 +83,18 @@ public class Screen {
         gameLayout = new GridBagLayout();
         gridContraints = new GridBagConstraints();
         gamePanel.setLayout(gameLayout);
-        buttons = new Cell[x*y];
+        buttons = new Cell[x][y];
         int k = 0;
+        Integer[] pos = new Integer[2];
         for(int i = 0; i < x; i++){
             for (int j = 0; j < y; j++){
-                buttons[k] = new Cell(k);
+                pos[0] = i;
+                pos[1] = j;
+                buttons[i][j] = new Cell(pos);
                 gridContraints.fill = GridBagConstraints.BOTH;
                 gridContraints.gridy = i;
                 gridContraints.gridx = j;
-                gamePanel.add(buttons[k],gridContraints);
+                gamePanel.add(buttons[i][j],gridContraints);
                 k++;
             }
         }

@@ -5,8 +5,11 @@ package Buttons;
  */
 public class Bomb extends Cell {
 
-    public Bomb(int i){
+    public Bomb(Integer[] i){
         super(i);
+    }
+    public String toString(){
+        return "Bomb";
     }
 }
 

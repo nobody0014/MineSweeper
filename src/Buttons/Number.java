@@ -5,9 +5,12 @@ package Buttons;
  */
 public class Number extends Cell {
     NumberListener numListen;
-    public Number(int i,String noBombs){
+    public Number(Integer[] i,int noBombs){
         super(i);
         element = noBombs;
         numListen = new NumberListener();
+    }
+    public String toString(){
+        return "Number";
     }
 }
