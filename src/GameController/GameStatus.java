@@ -1,3 +1,5 @@
+package GameController;
+
 import java.util.ArrayList;
 
 /**
@@ -5,6 +7,7 @@ import java.util.ArrayList;
  */
 public class GameStatus {
     private int[] gameState;
+
     public GameStatus(){
         gameState = new int[3];
         gameState[0] = 16;
@@ -19,9 +22,11 @@ public class GameStatus {
     public int  getGridX(){
         return gameState[1];
     }
+
     public int getNumberOfBombs(){
         return gameState[2];
     }
+
     public void changeLevel(int lvl){
         //0 is the Height
         //1 is the Width
@@ -46,6 +51,5 @@ public class GameStatus {
         gameState[0] = y;
         gameState[1] = x;
         gameState[2] = bombs;
-
     }
 }

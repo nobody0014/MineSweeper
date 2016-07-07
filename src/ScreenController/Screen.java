@@ -1,9 +1,8 @@
+package ScreenController;
+
+import Buttons.*;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Created by wit on 7/5/2016.
@@ -23,8 +22,6 @@ public class Screen {
     private JMenu menu;
     private Cell buttons[];
 
-
-
     public void makeScreen(int x, int y){
         Toolkit tk =  Toolkit.getDefaultToolkit();
         Dimension dim = tk.getScreenSize();
@@ -36,7 +33,7 @@ public class Screen {
 
         //Add constant to Y dimension to give area for restart, timer, and number of bombs
         //mainFrame.setSize(x * 40 + 100, y * 40 + 100);
-        mainFrame.setSize(200 + x * 40 ,600);
+        mainFrame.setSize(100 + x * 40 ,600);
         //Get X and Y locations where you can start the screen in the middle
         int midX =  dim.width/2 - mainFrame.getWidth()/2;
         int midY = dim.height/2 - mainFrame.getHeight()/2;
@@ -72,12 +69,10 @@ public class Screen {
         gameConstraint.fill = GridBagConstraints.BOTH;
         gameConstraint.gridx = 1;
         gameConstraint.gridy = 0;
-        gameConstraint.ipadx = x*40 + 100;
+        gameConstraint.ipadx = x*40;
         gameConstraint.ipady = 600;
         gameConstraint.anchor = GridBagConstraints.FIRST_LINE_END;
         controlContainer.add(gamePanel);
-
-
         mainFrame.setVisible(true);
 
     }
@@ -92,7 +87,7 @@ public class Screen {
         int k = 0;
         for(int i = 0; i < x; i++){
             for (int j = 0; j < y; j++){
-                buttons[k] = new Cell();
+                buttons[k] = new Cell(k);
                 gridContraints.fill = GridBagConstraints.BOTH;
                 gridContraints.gridy = i;
                 gridContraints.gridx = j;
