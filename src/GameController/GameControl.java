@@ -19,12 +19,14 @@ public class GameControl {
         board = new Cell[x][y];
     }
     public void setBombs(int noBombs){
+        //create a Random object
         Random rand = new Random();
+        //An Integer[] Object to keep the coordinates
         Integer[] coor;
         int posX;
         int posY;
         while (bombPos.size() < noBombs){
-            //Make new object cus otherwise the program would detect the same old object
+            //Since we are using objects, we have to create new objects for every coordinates
             coor = new Integer[2];
             posX = rand.nextInt(x-1);
             posY = rand.nextInt(y-1);
@@ -36,7 +38,9 @@ public class GameControl {
                 positionFilled.add(coor);
             }
         }
+        System.out.println(boardString());
     }
+    //Use this after obtaining the bombs coordinates
     public void setNumber(){
         HashMap<Integer[], Integer> numPos = new HashMap<>();
         // This for loop will get all the possible numbers
@@ -51,6 +55,7 @@ public class GameControl {
         int posX;
         int posY;
         for(Integer[] i: bombPos){
+            System.out.println(Arrays.toString(i));
             //Due to the structure of how objects work, we have to crete new one everytime
             //Otherwise we would be changing the value of the same object over and over again
             t = new Integer[2];
@@ -117,7 +122,10 @@ public class GameControl {
         }
         for (Integer[] i : numPos.keySet()){
             positionFilled.add(i);
-            board[i[0]][i[1]] = new Number(i,numPos.get(i));
+            if(board[i[0]][i[1]]  == null){
+                board[i[0]][i[1]] = new Number(i,numPos.get(i));
+            }
+
         }
         Integer[] coor = new Integer[2];
         for(int i = 0; i < x; i++){
@@ -133,15 +141,22 @@ public class GameControl {
 
 
     //Getter methods start here
+    //Get the board back but not the string part.
     public Cell[][] getBoard(){
         return board;
     }
+    //Get the state of the board.
     public String boardString(){
         String boardString = "[";
         for (int i = 0; i < x; i++){
             boardString += "[";
             for (int j = 0; j < y; j++){
-                boardString += board[i][j].toString();
+                if(board[i][j] != null){
+                    boardString += board[i][j].toString();
+                }
+                else{
+                    boardString += "null";
+                }
                 if(j != x-1){
                     boardString += ",";
                 }

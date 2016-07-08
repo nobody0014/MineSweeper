@@ -6,8 +6,9 @@ import java.util.ArrayList;
  * Created by wit on 7/5/2016.
  */
 public class GameStatus {
-    private boolean firstClick = false;
+    public static boolean firstClick = false;
     private int[] gameState;
+    private int time;
 
     public GameStatus(){
         gameState = new int[3];
