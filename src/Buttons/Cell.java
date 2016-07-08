@@ -7,14 +7,17 @@ import javax.swing.*;
  */
 public class Cell extends JButton {
     CellListerner cellListen;
-    int element;
     Integer[] pos;
+    JLabel label;
+    int element;
     public Cell(Integer[] i){
         pos = i;
         cellListen = new CellListerner();
+        addActionListener(cellListen);
+        label = new JLabel();
     }
-    public int reveal(){
-        return element;
+    public void changeLabel(){
+        label.setText("");
     }
     public String toString(){
         return "";

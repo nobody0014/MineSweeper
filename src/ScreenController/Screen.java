@@ -1,6 +1,9 @@
 package ScreenController;
 
 import Buttons.*;
+import GameController.GameControl;
+import GameController.GameStatus;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -74,9 +77,13 @@ public class Screen {
         gameConstraint.anchor = GridBagConstraints.FIRST_LINE_END;
         controlContainer.add(gamePanel);
         mainFrame.setVisible(true);
-
     }
 
+    public static void setNewBoard(Cell[][] board){
+        if(!(GameStatus.firstClick)){
+
+        }
+    }
 
     public void makeGrid(int x, int y){
         gamePanel = new JPanel();

@@ -29,5 +29,7 @@ public class Main {
         System.out.println("Making new Screen");
         someFrame.makeScreen(someStatus.getGridX(), someStatus.getGridY());
         System.out.println("Complete");
+        System.out.println("Waiting for the first click");
+
     }
 }

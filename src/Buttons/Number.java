@@ -10,6 +10,9 @@ public class Number extends Cell {
         element = noBombs;
         numListen = new NumberListener();
     }
+    public void changeLabel(){
+        label.setText(String.valueOf(element));
+    }
     public String toString(){
         return "Number";
     }
