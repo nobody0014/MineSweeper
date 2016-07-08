@@ -9,7 +9,7 @@ import java.util.Arrays;
  */
 public class Main {
     public static void main(String[] args){
-//        Screen someFrame = new Screen();
+        Screen someFrame = new Screen();
         System.out.println("Making Game Status");
         GameStatus someStatus = new GameStatus();
         System.out.println("Done Making Game Status");
@@ -26,7 +26,8 @@ public class Main {
         gameControl.setNumber();
         System.out.println("Complete");
         System.out.println(gameControl.boardString());
-//        someStatus.changeLevel(3);
-//        someFrame.makeScreen(someStatus.getGridX(), someStatus.getGridY());
+        System.out.println("Making new Screen");
+        someFrame.makeScreen(someStatus.getGridX(), someStatus.getGridY());
+        System.out.println("Complete");
     }
 }

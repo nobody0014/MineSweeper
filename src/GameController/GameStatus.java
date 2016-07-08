@@ -8,7 +8,6 @@ import java.util.ArrayList;
 public class GameStatus {
     public static boolean firstClick = false;
     private int[] gameState;
-    private int time;
 
     public GameStatus(){
         gameState = new int[3];
