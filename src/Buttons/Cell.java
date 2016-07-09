@@ -1,6 +1,7 @@
 package Buttons;
 
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * Created by wit on 7/5/2016.
@@ -14,6 +15,7 @@ public class Cell extends JButton {
         pos = i;
         cellListen = new CellListerner();
         addActionListener(cellListen);
+        this.setPreferredSize(new Dimension(25,25));
         label = new JLabel();
     }
     public void changeLabel(){
@@ -22,5 +24,6 @@ public class Cell extends JButton {
     public String toString(){
         return "";
     }
+
 
 }

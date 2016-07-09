@@ -9,6 +9,7 @@ public class Number extends Cell {
         super(i);
         element = noBombs;
         numListen = new NumberListener();
+        addActionListener(numListen);
     }
     public void changeLabel(){
         label.setText(String.valueOf(element));

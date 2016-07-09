@@ -8,17 +8,75 @@ import java.util.*;
  * Created by wit on 7/7/2016.
  */
 public class GameControl {
+    public static boolean firstClick = false;
     Cell[][] board;
-    ArrayList<Integer[]> bombPos = new ArrayList<>();
-    HashSet<Integer[]> positionFilled = new HashSet<>();
-    int x;
-    int y;
-    public GameControl(int boardSizeX, int boardSizeY){
-        x = boardSizeX;
-        y = boardSizeY;
+    ArrayList<Integer[]> bombPos;
+    HashSet<Integer[]> positionFilled;
+    private int x;
+    private int y;
+    private int noBombs;
+    public GameControl(){
+        x = 30;
+        y = 16;
+        noBombs = 99;
         board = new Cell[x][y];
+        bombPos = new ArrayList<>();
+        positionFilled = new HashSet<>();
     }
-    public void setBombs(int noBombs){
+    //Get Height
+    public int getGridY(){
+        return y;
+    }
+    //Get Width
+    public int  getGridX(){
+        return x;
+    }
+
+    public int getNumberOfBombs(){
+        return noBombs;
+    }
+
+    public void changeLevel(int lvl){
+        //0 is the Height
+        //1 is the Width
+        //2 is the number of bombs
+        if(lvl == 1){
+            x = 9;
+            y = 9;
+            noBombs = 10;
+        }
+        else if(lvl == 2){
+            x = 16;
+            y = 16;
+            noBombs = 40;
+        }
+        else if(lvl == 3){
+            x = 30;
+            y = 16;
+            noBombs = 99;
+        }
+    }
+    public void changeLevel(int x, int y, int bombs){
+        this.x = x;
+        this.y = y;
+        noBombs = bombs;
+    }
+
+    public void setUpBoard(){
+        if(!firstClick){
+            System.out.println("Put in bombs");
+            setBombs();
+            System.out.println("Complete");
+            System.out.println("Put in Numbers and Empties");
+            setNumber();
+            System.out.println("Complete");
+        }
+        else{
+            System.out.println("Game has already started");
+        }
+
+    }
+    private void setBombs(){
         //create a Random object
         Random rand = new Random();
         //An Integer[] Object to keep the coordinates
@@ -38,10 +96,9 @@ public class GameControl {
                 positionFilled.add(coor);
             }
         }
-        System.out.println(boardString());
     }
     //Use this after obtaining the bombs coordinates
-    public void setNumber(){
+    private void setNumber(){
         HashMap<Integer[], Integer> numPos = new HashMap<>();
         // This for loop will get all the possible numbers
         Integer[] t;
@@ -55,7 +112,6 @@ public class GameControl {
         int posX;
         int posY;
         for(Integer[] i: bombPos){
-            System.out.println(Arrays.toString(i));
             //Due to the structure of how objects work, we have to crete new one everytime
             //Otherwise we would be changing the value of the same object over and over again
             t = new Integer[2];
