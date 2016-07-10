@@ -3,6 +3,7 @@ package Buttons;
 import GameController.GameControl;
 
 import java.awt.event.*;
+import java.util.Arrays;
 
 /**
  * Created by wit on 7/6/2016.
@@ -16,5 +17,6 @@ public class CellListerner implements ActionListener {
         if(!GameControl.firstClick){
             GameControl.firstClick = true;
         }
+        System.out.println(Arrays.toString(cellClicked.getPos()));
     }
 }

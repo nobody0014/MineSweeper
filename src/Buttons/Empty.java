@@ -10,6 +10,9 @@ public class Empty extends Number {
         emptListen = new EmptyListener();
         addActionListener(emptListen);
     }
+    public void changeLabel(){
+        label.setText("Empty");
+    }
     public String toString(){
         return "Empty";
     }

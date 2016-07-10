@@ -9,32 +9,23 @@ import java.util.*;
  */
 public class GameControl {
     public static boolean firstClick = false;
-    Cell[][] board;
-    ArrayList<Integer[]> bombPos;
-    HashSet<Integer[]> positionFilled;
+    private Cell[][] board;
+    private HashSet<Integer[]> bombPos;
+    private HashSet<Integer[]> noBombArea;
+    private HashSet<Integer[]> positionFilled;
     private int x;
     private int y;
     private int noBombs;
+
     public GameControl(){
-        x = 30;
-        y = 16;
-        noBombs = 99;
+        x = 10;
+        y = 5;
+        noBombs = 10;
         board = new Cell[x][y];
-        bombPos = new ArrayList<>();
+        bombPos = new HashSet<>();
         positionFilled = new HashSet<>();
     }
-    //Get Height
-    public int getGridY(){
-        return y;
-    }
-    //Get Width
-    public int  getGridX(){
-        return x;
-    }
 
-    public int getNumberOfBombs(){
-        return noBombs;
-    }
 
     public void changeLevel(int lvl){
         //0 is the Height
@@ -62,8 +53,10 @@ public class GameControl {
         noBombs = bombs;
     }
 
-    public void setUpBoard(){
+    public void setUpBoard(Integer[] firstClickPos){
         if(!firstClick){
+            System.out.println("Setting up no bombs area");
+            setNoBombArea(firstClickPos);
             System.out.println("Put in bombs");
             setBombs();
             System.out.println("Complete");
@@ -74,28 +67,73 @@ public class GameControl {
         else{
             System.out.println("Game has already started");
         }
-
+    }
+    private void setNoBombArea(Integer[] pos){
+        noBombArea = new HashSet<>();
+        // I do not want any bomb to be beside the point where the user start clicking because it might result in
+        // first click death, so i create an area to ward that off
+        noBombArea.add(pos);
+        Integer[] t = new Integer[2];
+        Integer[] tR = new Integer[2];
+        Integer[] tL = new Integer[2];
+        Integer[] l = new Integer[2];
+        Integer[] r = new Integer[2];
+        Integer[] b = new Integer[2];
+        Integer[] bR = new Integer[2];
+        Integer[] bL = new Integer[2];
+        int posX = pos[0];
+        int posY = pos[1];
+        t[0] = posX;
+        t[1] = posY - 1;
+        tR[0] = posX + 1;
+        tR[1] = posY - 1;
+        tL[0] = posX - 1;
+        tL[1] = posY - 1;
+        l[0] = posX - 1;
+        l[1] = posY;
+        r[0] = posX + 1;
+        r[1] = posY;
+        b[0] = posX;
+        b[1] = posY + 1;
+        bR[0] = posX + 1;
+        bR[1] = posY + 1;
+        bL[0] = posX - 1;
+        bL[1] = posY + 1;
+        noBombArea.add(bL);
+        noBombArea.add(bR);
+        noBombArea.add(b);
+        noBombArea.add(r);
+        noBombArea.add(l);
+        noBombArea.add(t);
+        noBombArea.add(tL);
+        noBombArea.add(tR);
     }
     private void setBombs(){
         //create a Random object
         Random rand = new Random();
-        //An Integer[] Object to keep the coordinates
-        Integer[] coor;
         int posX;
         int posY;
+        for(Integer[] i : noBombArea){
+            System.out.println(Arrays.toString(i));
+        }
         while (bombPos.size() < noBombs){
             //Since we are using objects, we have to create new objects for every coordinates
-            coor = new Integer[2];
+            Integer[] coor = new Integer[2];
             posX = rand.nextInt(x-1);
             posY = rand.nextInt(y-1);
             coor[0] = posX;
             coor[1] = posY;
-            if(!bombPos.contains(coor)){
+            contains(bombPos,coor);
+            if(!contains(bombPos,coor) && !contains(noBombArea,coor)){
                 bombPos.add(coor);
                 board[posX][posY] = new Bomb(coor);
                 positionFilled.add(coor);
             }
         }
+        for(Integer[] i : bombPos){
+            System.out.println(Arrays.toString(i));
+        }
+        System.out.println(boardString());
     }
     //Use this after obtaining the bombs coordinates
     private void setNumber(){
@@ -183,10 +221,11 @@ public class GameControl {
             }
 
         }
-        Integer[] coor = new Integer[2];
+
         for(int i = 0; i < x; i++){
             for (int j = 0; j < y; j++){
                 if(board[i][j] == null){
+                    Integer[] coor = new Integer[2];
                     coor[0] = i;
                     coor[1] = j;
                     board[i][j] = new Empty(coor,0);
@@ -195,20 +234,49 @@ public class GameControl {
         }
     }
 
+    private boolean contains(HashSet<Integer[]> aSet, Integer[] i){
+        boolean checker = false;
+        for(Integer[] someArray: aSet){
+            checker = evaluate(someArray,i);
+            if(checker){
+                break;
+            }
+        }
+        return checker;
+    }
+    //Evaluating Coordinate if they are the same or not (true if same) (false if not same)
+    private boolean evaluate(Integer[] i, Integer[] j){
+        if(i[0].equals(j[0]) && i[1].equals(j[1])){
+            return true;
+        }
+        return false;
+    }
 
     //Getter methods start here
     //Get the board back but not the string part.
     public Cell[][] getBoard(){
         return board;
     }
-    //Get the state of the board.
+    //Get Height
+    public int getGridY(){
+        return y;
+    }
+    //Get Width
+    public int  getGridX(){
+        return x;
+    }
+    //Get NumberOfBombs
+    public int getNumberOfBombs(){
+        return noBombs;
+    }
+    //Get the state of the board (in string form).
     public String boardString(){
         String boardString = "[";
-        for (int i = 0; i < x; i++){
+        for (int i = 0; i < y; i++){
             boardString += "[";
-            for (int j = 0; j < y; j++){
-                if(board[i][j] != null){
-                    boardString += board[i][j].toString();
+            for (int j = 0; j < x; j++){
+                if(board[j][i] != null){
+                    boardString += board[j][i].toString();
                 }
                 else{
                     boardString += "null";
@@ -223,7 +291,6 @@ public class GameControl {
             }
         }
         boardString += "]";
-
         return boardString;
     }
 }

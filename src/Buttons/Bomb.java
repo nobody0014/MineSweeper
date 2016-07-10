@@ -7,10 +7,10 @@ public class Bomb extends Cell {
     BombListener bombListen;
     public Bomb(Integer[] i){
         super(i);
-    }
-    public void changeLabel(){
         bombListen = new BombListener();
         addActionListener(bombListen);
+    }
+    public void changeLabel(){
         label.setText("Bomb");
     }
     public String toString(){

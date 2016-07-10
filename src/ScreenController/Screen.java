@@ -92,28 +92,28 @@ public class Screen {
         gridContraints = new GridBagConstraints();
         gridContraints.anchor = GridBagConstraints.FIRST_LINE_START;
         buttons = new Cell[x][y];
-        Integer[] pos = new Integer[2];
-        for(int i = 0; i < x; i++){
-            for (int j = 0; j < y; j++){
-                pos[0] = i;
-                pos[1] = j;
-                buttons[i][j] = new Cell(pos);
-                gridContraints.gridx = i;
-                gridContraints.gridy = j;
-                buttons[i][j].addActionListener(new FirstButtonClickListener());
-                gamePanel.add(buttons[i][j],gridContraints);
+        for(int i = 0; i < y; i++){
+            for (int j = 0; j < x; j++){
+                Integer[] pos = new Integer[2];
+                pos[0] = j;
+                pos[1] = i;
+                buttons[j][i] = new Cell(pos);
+                gridContraints.gridx = j;
+                gridContraints.gridy = i;
+                buttons[j][i].addActionListener(new FirstButtonClickListener());
+                gamePanel.add(buttons[j][i],gridContraints);
             }
         }
     }
     public void makeGrid(Cell[][] actualGrid){
         gamePanel.removeAll();
         gamePanel.setVisible(false);
-        for(int i = 0; i < actualGrid.length; i++){
-            for (int j = 0; j < actualGrid[i].length; j++){
-                buttons[i][j] = actualGrid[i][j];
-                gridContraints.gridx = i;
-                gridContraints.gridy = j;
-                gamePanel.add(buttons[i][j],gridContraints);
+        for(int i = 0; i < actualGrid[i].length; i++){
+            for (int j = 0; j < actualGrid.length; j++){
+                buttons[j][i] = actualGrid[j][i];
+                gridContraints.gridx = j;
+                gridContraints.gridy = i;
+                gamePanel.add(buttons[j][i],gridContraints);
             }
         }
         controlContainer.add(gamePanel,gameConstraint);
@@ -122,9 +122,11 @@ public class Screen {
     private class FirstButtonClickListener implements ActionListener{
         public void actionPerformed(ActionEvent e){
             if(!GameControl.firstClick){
-                GC.setUpBoard();
+                Cell firstClickCell = (Cell) e.getSource();
+                GC.setUpBoard(firstClickCell.getPos());
                 makeGrid(GC.getBoard());
                 GameControl.firstClick = true;
+                System.out.println(GC.boardString());
             }
         }
     }

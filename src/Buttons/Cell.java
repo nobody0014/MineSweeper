@@ -21,6 +21,9 @@ public class Cell extends JButton {
     public void changeLabel(){
         label.setText("");
     }
+    public Integer[] getPos(){
+        return pos;
+    }
     public String toString(){
         return "";
     }
