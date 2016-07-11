@@ -104,17 +104,12 @@ public class Screen {
     public void makeGrid(Cell[][] actualGrid){
         gamePanel.removeAll();
         gamePanel.setVisible(false);
-        for(int i = 0; i < actualGrid[i].length; i++){
-            for (int j = 0; j < actualGrid.length; j++){
+        for(int i = 0; i < GC.getGridY(); i++){
+            for (int j = 0; j < GC.getGridX(); j++){
                 buttons[j][i] = actualGrid[j][i];
                 gridContraints.gridx = j;
                 gridContraints.gridy = i;
                 gamePanel.add(buttons[j][i],gridContraints);
-            }
-            //The reason I have to break is because there is an unknown bug that does not stop i
-            //Feel free to remove the break and start breaking the game
-            if(i == 8){
-                break;
             }
         }
         controlContainer.add(gamePanel,gameConstraint);
