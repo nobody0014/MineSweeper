@@ -7,6 +7,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by wit on 7/5/2016.
@@ -33,7 +37,6 @@ public class Screen {
     public void makeScreen(){
         int x = GC.getGridX();
         int y = GC.getGridY();
-        int HeightUsed;
         Toolkit tk =  Toolkit.getDefaultToolkit();
         Dimension dim = tk.getScreenSize();
         menuBar = new JMenuBar();
@@ -41,14 +44,7 @@ public class Screen {
         menu = new JMenu("A Menu");
         menuBar.add(menu);
         mainFrame = new JFrame("Main");
-        if(y * 40 > 600){
-            HeightUsed = y*40;
-            mainFrame.setSize(100 + x * 30 ,y*30);
-        }
-        else{
-            HeightUsed = 600;
-            mainFrame.setSize(100 + x * 30 ,600);
-        }
+        mainFrame.setSize(x * 45 + 25,200 + y*45);
         //Add constant to Y dimension to give area for restart, timer, and number of bombs
 
         //Get X and Y locations where you can start the screen in the middle
@@ -71,7 +67,7 @@ public class Screen {
         infoConstraint = new GridBagConstraints();
         infoConstraint.gridx = 0;
         infoConstraint.gridy = 0;
-        infoConstraint.anchor = GridBagConstraints.FIRST_LINE_START;
+        infoConstraint.anchor = GridBagConstraints.PAGE_START;
         controlContainer.add(infoPanel,infoConstraint);
         infoPanel.setVisible(true);
 
@@ -79,9 +75,9 @@ public class Screen {
         gameLayout = new GridBagLayout();
         gameConstraint = new GridBagConstraints();
         gamePanel.setLayout(gameLayout);
-        gameConstraint.gridx = 1;
-        gameConstraint.gridy = 0;
-        gameConstraint.anchor = GridBagConstraints.FIRST_LINE_END;
+        gameConstraint.gridx = 0;
+        gameConstraint.gridy = 1;
+        gameConstraint.anchor = GridBagConstraints.CENTER;
         gameConstraint.fill = GridBagConstraints.BOTH;
         controlContainer.add(gamePanel,gameConstraint);
         makeGrid(x,y);
@@ -94,7 +90,7 @@ public class Screen {
         buttons = new Cell[x][y];
         for(int i = 0; i < y; i++){
             for (int j = 0; j < x; j++){
-                Integer[] pos = new Integer[2];
+                int[] pos = new int[2];
                 pos[0] = j;
                 pos[1] = i;
                 buttons[j][i] = new Cell(pos);
@@ -115,20 +111,42 @@ public class Screen {
                 gridContraints.gridy = i;
                 gamePanel.add(buttons[j][i],gridContraints);
             }
+            //The reason I have to break is because there is an unknown bug that does not stop i
+            //Feel free to remove the break and start breaking the game
+            if(i == 8){
+                break;
+            }
         }
         controlContainer.add(gamePanel,gameConstraint);
         gamePanel.setVisible(true);
     }
+
     private class FirstButtonClickListener implements ActionListener{
         public void actionPerformed(ActionEvent e){
             if(!GameControl.firstClick){
                 Cell firstClickCell = (Cell) e.getSource();
+                int[] pos = ((Cell) e.getSource()).getPos();
+                System.out.println("Set up new board");
                 GC.setUpBoard(firstClickCell.getPos());
+                System.out.println("Done");
+                System.out.println("Put in the UI");
                 makeGrid(GC.getBoard());
+                System.out.println("Done");
                 GameControl.firstClick = true;
                 System.out.println(GC.boardString());
+                System.out.println("Revealing the opening moves");
+                System.out.println("Getting area to reveal");
+                Set<int[]> someArea = GC.getAreaToReveal(pos, new HashSet<>());
+                someArea.add(pos);
+                System.out.println("Done");
+                for (int[] i: someArea){
+                    System.out.println(Arrays.toString(i));
+                    GC.revealedArea.add(i);
+                    buttons[i[0]][i[1]].reveal();
+                }
+                System.out.println("Done");
+
             }
         }
     }
-
 }

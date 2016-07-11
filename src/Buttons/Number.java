@@ -5,14 +5,14 @@ package Buttons;
  */
 public class Number extends Cell {
     NumberListener numListen;
-    public Number(Integer[] i,int noBombs){
+    public Number(int[] i,int noBombs){
         super(i);
         element = noBombs;
         numListen = new NumberListener();
         addActionListener(numListen);
     }
-    public void changeLabel(){
-        label.setText(String.valueOf(element));
+    public void reveal(){
+        this.setText(String.valueOf(element));
     }
     public String toString(){
         return "Number";

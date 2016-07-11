@@ -5,14 +5,12 @@ package Buttons;
  */
 public class Bomb extends Cell {
     BombListener bombListen;
-    public Bomb(Integer[] i){
+    public Bomb(int[] i){
         super(i);
         bombListen = new BombListener();
         addActionListener(bombListen);
     }
-    public void changeLabel(){
-        label.setText("Bomb");
-    }
+    public void reveal(){this.setText("B");}
     public String toString(){
         return "Bomb";
     }

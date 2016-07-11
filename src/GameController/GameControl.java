@@ -1,7 +1,13 @@
 package GameController;
 import Buttons.*;
 import Buttons.Number;
+import com.sun.org.apache.regexp.internal.RE;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.*;
 
 /**
@@ -9,21 +15,25 @@ import java.util.*;
  */
 public class GameControl {
     public static boolean firstClick = false;
+    public HashSet<int[]> revealedArea;
     private Cell[][] board;
-    private HashSet<Integer[]> bombPos;
-    private HashSet<Integer[]> noBombArea;
-    private HashSet<Integer[]> positionFilled;
+    private HashSet<int[]> bombPos;
+    private HashSet<int[]> noBombArea;
+    private HashSet<int[]> positionFilled;
     private int x;
     private int y;
     private int noBombs;
+    private boolean isGameOver;
 
     public GameControl(){
-        x = 10;
-        y = 5;
+        x = 9;
+        y = 9;
         noBombs = 10;
         board = new Cell[x][y];
         bombPos = new HashSet<>();
         positionFilled = new HashSet<>();
+        revealedArea = new HashSet<>();
+        isGameOver = false;
     }
 
 
@@ -53,7 +63,7 @@ public class GameControl {
         noBombs = bombs;
     }
 
-    public void setUpBoard(Integer[] firstClickPos){
+    public void setUpBoard(int[] firstClickPos){
         if(!firstClick){
             System.out.println("Setting up no bombs area");
             setNoBombArea(firstClickPos);
@@ -68,19 +78,120 @@ public class GameControl {
             System.out.println("Game has already started");
         }
     }
-    private void setNoBombArea(Integer[] pos){
-        noBombArea = new HashSet<>();
+    private void setNoBombArea(int[] pos){
+        noBombArea = getAllDirection(pos);
         // I do not want any bomb to be beside the point where the user start clicking because it might result in
         // first click death, so i create an area to ward that off
         noBombArea.add(pos);
-        Integer[] t = new Integer[2];
-        Integer[] tR = new Integer[2];
-        Integer[] tL = new Integer[2];
-        Integer[] l = new Integer[2];
-        Integer[] r = new Integer[2];
-        Integer[] b = new Integer[2];
-        Integer[] bR = new Integer[2];
-        Integer[] bL = new Integer[2];
+    }
+    private void setBombs(){
+        //create a Random object
+        Random rand = new Random();
+        int posX;
+        int posY;
+        while (bombPos.size() < noBombs){
+            //Since we are using objects, we have to create new objects for every coordinates
+            int[] coor = new int[2];
+            posX = rand.nextInt(x-1);
+            posY = rand.nextInt(y-1);
+            coor[0] = posX;
+            coor[1] = posY;
+            contains(bombPos,coor);
+            if(!contains(bombPos,coor) && !contains(noBombArea,coor)){
+                bombPos.add(coor);
+                board[posX][posY] = new Bomb(coor);
+                positionFilled.add(coor);
+            }
+        }
+    }
+    //Use this after obtaining the bombs coordinates
+    private void setNumber(){
+        ArrayList<int[]> numPos = new ArrayList<>();
+        for(int[] i: bombPos){
+            HashSet<int[]> areaSet = getAllDirection(i);
+            for (int[] j: areaSet){
+                if(checkValidPos(j)){
+                    numPos.add(j);
+                }
+            }
+        }
+        System.out.println("Done");
+
+        for (int[] i : numPos){
+            positionFilled.add(i);
+            if(board[i[0]][i[1]]  == null){
+                board[i[0]][i[1]] = new Number(i,countCoord(numPos,i));
+            }
+        }
+        for(int i = 0; i < x; i++){
+            for (int j = 0; j < y; j++){
+                if(board[i][j] == null){
+                    int[] coor = new int[2];
+                    coor[0] = i;
+                    coor[1] = j;
+                    board[i][j] = new Empty(coor,0);
+                }
+            }
+        }
+    }
+
+    private boolean contains(Set<int[]> aSet, int[] i){
+        boolean checker = false;
+        for(int[] someArray: aSet){
+            checker = evaluate(someArray,i);
+            if(checker){
+                break;
+            }
+        }
+        return checker;
+    }
+    private boolean contains(ArrayList<int[]> aList, int[] i){
+        boolean checker = false;
+        for(int[] someArray: aList){
+            checker = evaluate(someArray,i);
+            if(checker){
+                break;
+            }
+        }
+        return checker;
+    }
+
+    //Evaluating Coordinate if they are the same or not (true if same) (false if not same)
+    private boolean evaluate(int[] i, int[] j){
+        boolean check =  (i[0] == j[0] && i[1] == j[1]);
+        if(i[0] == j[0] && i[1] == j[1]){
+            return true;
+        }
+        return false;
+    }
+    private boolean checkValidPos(int pos[]){
+        if(pos[0] < 0 || pos[0] >= x || pos[1] < 0 || pos[1] >= y){
+            return false;
+        }
+        return true;
+    }
+    private int countCoord(ArrayList<int[]> coords, int[] i){
+        int count = 0;
+        for(int[] j: coords){
+            if(evaluate(i,j)){
+                count++;
+            }
+        }
+        return count;
+    }
+    private HashSet<int[]> getAllDirection(int[] pos){
+        //Due to the structure of how objects work, we have to crete new one everytime
+        //Otherwise we would be changing the value of the same object over and over again
+        int[] t = new int[2];
+        int[] tR = new int[2];
+        int[] tL = new int[2];
+        int[] l = new int[2];
+        int[] r = new int[2];
+        int[] b = new int[2];
+        int[] bR = new int[2];
+        int[] bL = new int[2];
+
+        //We use the int so that we would not mess with the actual object in bombPos
         int posX = pos[0];
         int posY = pos[1];
         t[0] = posX;
@@ -99,157 +210,42 @@ public class GameControl {
         bR[1] = posY + 1;
         bL[0] = posX - 1;
         bL[1] = posY + 1;
-        noBombArea.add(bL);
-        noBombArea.add(bR);
-        noBombArea.add(b);
-        noBombArea.add(r);
-        noBombArea.add(l);
-        noBombArea.add(t);
-        noBombArea.add(tL);
-        noBombArea.add(tR);
+        HashSet<int[]> allPos = new HashSet<>();
+        allPos.add(t);
+        allPos.add(tR);
+        allPos.add(tL);
+        allPos.add(b);
+        allPos.add(bR);
+        allPos.add(bL);
+        allPos.add(l);
+        allPos.add(r);
+        return  allPos;
     }
-    private void setBombs(){
-        //create a Random object
-        Random rand = new Random();
-        int posX;
-        int posY;
-        for(Integer[] i : noBombArea){
-            System.out.println(Arrays.toString(i));
+    public Set<int[]> getAreaToReveal(int [] pos, Set<int[]> area){
+        if(!checkValidPos(pos)){
+            return area;
         }
-        while (bombPos.size() < noBombs){
-            //Since we are using objects, we have to create new objects for every coordinates
-            Integer[] coor = new Integer[2];
-            posX = rand.nextInt(x-1);
-            posY = rand.nextInt(y-1);
-            coor[0] = posX;
-            coor[1] = posY;
-            contains(bombPos,coor);
-            if(!contains(bombPos,coor) && !contains(noBombArea,coor)){
-                bombPos.add(coor);
-                board[posX][posY] = new Bomb(coor);
-                positionFilled.add(coor);
-            }
-        }
-        for(Integer[] i : bombPos){
-            System.out.println(Arrays.toString(i));
-        }
-        System.out.println(boardString());
-    }
-    //Use this after obtaining the bombs coordinates
-    private void setNumber(){
-        HashMap<Integer[], Integer> numPos = new HashMap<>();
-        // This for loop will get all the possible numbers
-        Integer[] t;
-        Integer[] tR;
-        Integer[] tL;
-        Integer[] l;
-        Integer[] r;
-        Integer[] b ;
-        Integer[] bR;
-        Integer[] bL;
-        int posX;
-        int posY;
-        for(Integer[] i: bombPos){
-            //Due to the structure of how objects work, we have to crete new one everytime
-            //Otherwise we would be changing the value of the same object over and over again
-            t = new Integer[2];
-            tR = new Integer[2];
-            tL = new Integer[2];
-            l = new Integer[2];
-            r = new Integer[2];
-            b = new Integer[2];
-            bR = new Integer[2];
-            bL = new Integer[2];
-
-            //We use the int so that we would not mess with the actual object in bombPos
-            posX = i[0];
-            posY = i[1];
-            t[0] = posX;
-            t[1] = posY - 1;
-            tR[0] = posX + 1;
-            tR[1] = posY - 1;
-            tL[0] = posX - 1;
-            tL[1] = posY - 1;
-            l[0] = posX - 1;
-            l[1] = posY;
-            r[0] = posX + 1;
-            r[1] = posY;
-            b[0] = posX;
-            b[1] = posY + 1;
-            bR[0] = posX + 1;
-            bR[1] = posY + 1;
-            bL[0] = posX - 1;
-            bL[1] = posY + 1;
-            //System.out.println(Arrays.toString());
-            if (!(bL[0] < 0 || bL[1] > y)){
-                if(numPos.containsKey(bL)){numPos.put(bL,numPos.get(bL));}
-                else{numPos.put(bL,1);}
-            }
-            if (!(bR[0] > x || bR[1] > y)){
-                if(numPos.containsKey(bR)){numPos.put(bR,numPos.get(bR));}
-                else{numPos.put(bR,1);}
-            }
-            if (!(b[1] > y)){
-                if(numPos.containsKey(b)){numPos.put(b,numPos.get(b));}
-                else{numPos.put(b,1);}
-            }
-            if (!(r[0] > x)){
-                if(numPos.containsKey(r)){numPos.put(r,numPos.get(r));}
-                else{numPos.put(r,1);}
-            }
-            if (!(l[0] < 0)){
-                if(numPos.containsKey(l)){numPos.put(l,numPos.get(l));}
-                else{numPos.put(l,1);}
-            }
-            if (!(t[1] < 0)){
-                if(numPos.containsKey(t)){numPos.put(t,numPos.get(t));}
-                else{numPos.put(t,1);}
-            }
-            if (!(tL[0] < 0 || tL[1] < 0 )){
-                if(numPos.containsKey(tL)){numPos.put(tL,numPos.get(tL));}
-                else{numPos.put(tL,1);}
-            }
-            if (!(tR[0] > x || tR[1] < 0)){
-                if(numPos.containsKey(tR)){numPos.put(tR,numPos.get(tR));}
-                else{numPos.put(tR,1);}
-            }
-        }
-        for (Integer[] i : numPos.keySet()){
-            positionFilled.add(i);
-            if(board[i[0]][i[1]]  == null){
-                board[i[0]][i[1]] = new Number(i,numPos.get(i));
-            }
-
-        }
-
-        for(int i = 0; i < x; i++){
-            for (int j = 0; j < y; j++){
-                if(board[i][j] == null){
-                    Integer[] coor = new Integer[2];
-                    coor[0] = i;
-                    coor[1] = j;
-                    board[i][j] = new Empty(coor,0);
+        else if(board[pos[0]][pos[1]] instanceof Empty){
+            HashSet<int[]> directions = getAllDirection(pos);
+            area.add(pos);
+            for (int[] i: directions){
+                if(checkValidPos(i)){
+                    if(board[i[0]][i[1]] instanceof Bomb || contains(area,i)){
+                        continue;
+                    }
+                    area.add(i);
+                    Set<int[]> results = getAreaToReveal(i,area);
+                    for (int[] each: results ){
+                        area.add(each);
+                    }
                 }
             }
+            return area;
         }
-    }
-
-    private boolean contains(HashSet<Integer[]> aSet, Integer[] i){
-        boolean checker = false;
-        for(Integer[] someArray: aSet){
-            checker = evaluate(someArray,i);
-            if(checker){
-                break;
-            }
+        else {
+            area.add(pos);
+            return area;
         }
-        return checker;
-    }
-    //Evaluating Coordinate if they are the same or not (true if same) (false if not same)
-    private boolean evaluate(Integer[] i, Integer[] j){
-        if(i[0].equals(j[0]) && i[1].equals(j[1])){
-            return true;
-        }
-        return false;
     }
 
     //Getter methods start here
@@ -292,5 +288,32 @@ public class GameControl {
         }
         boardString += "]";
         return boardString;
+    }
+    private class GameControlBombListener implements MouseListener{
+        public void mouseEntered(MouseEvent arg0){
+
+        }
+        public void mouseReleased(MouseEvent arg0) {
+
+        }
+        public void mouseClicked(MouseEvent arg0){
+            if(SwingUtilities.isRightMouseButton(arg0)){
+            }
+            else if(SwingUtilities.isRightMouseButton(arg0)){
+
+            }
+        }
+        public void mouseExited(MouseEvent arg0){
+
+        }
+        public void mousePressed(MouseEvent arg0){
+
+        }
+
+    }
+    private class GameControlEmptyListener implements ActionListener{
+        public void actionPerformed(ActionEvent e){
+
+        }
     }
 }

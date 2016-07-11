@@ -5,13 +5,13 @@ package Buttons;
  */
 public class Empty extends Number {
     EmptyListener emptListen;
-    public Empty(Integer[] i,int noBombs){
+    public Empty(int[] i,int noBombs){
         super(i,noBombs);
         emptListen = new EmptyListener();
         addActionListener(emptListen);
     }
-    public void changeLabel(){
-        label.setText("Empty");
+    public void reveal(){
+        this.setText("E");
     }
     public String toString(){
         return "Empty";
