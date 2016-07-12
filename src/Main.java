@@ -8,6 +8,7 @@ public class Main {
         System.out.println("Making a Screen");
         Screen someScreen = new Screen();
         System.out.println("Done");
+        someScreen.changeLevel(3);
         System.out.println("Bringing up the windows");
         someScreen.makeScreen();
         System.out.println("Done");

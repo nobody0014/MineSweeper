@@ -4,13 +4,11 @@ import Buttons.*;
 import GameController.GameControl;
 
 import javax.swing.*;
-import javax.swing.plaf.DimensionUIResource;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -19,8 +17,8 @@ import java.util.Set;
  * Created by wit on 7/5/2016.
  */
 public class Screen {
-
     private JFrame mainFrame;
+    private TimeThread timeThread;
     private Container controlContainer;
     private JPanel gamePanel;
     private JPanel infoPanel;
@@ -37,26 +35,30 @@ public class Screen {
     private Cell buttons[][];
     private GameControl GC;
 
+
     public Screen(){
         GC = new GameControl();
+        timeThread = new TimeThread("Clock");
     }
     public void makeScreen(){
         int x = GC.getGridX();
         int y = GC.getGridY();
         Toolkit tk =  Toolkit.getDefaultToolkit();
         Dimension dim = tk.getScreenSize();
+
         menuBar = new JMenuBar();
         menuBar.setBorderPainted(true);
         menu = new JMenu("A Menu");
         menuBar.add(menu);
         mainFrame = new JFrame("Main");
+
+        //Just in case that the x is not wide enough to contain all information
         if(x*45 > 450){
             mainFrame.setSize(x * 45 + 25, 150 + y*45);
         }
         else{
             mainFrame.setSize(450, 150 + y*45);
         }
-        //Add constant to Y dimension to give area for restart, timer, and number of bombs
 
         //Get X and Y locations where you can start the screen in the middle
         int midX =  dim.width/2 - mainFrame.getWidth()/2;
@@ -73,7 +75,7 @@ public class Screen {
         controlLayout = new GridBagLayout();
         controlContainer.setLayout(controlLayout);
 
-
+        //Creating info panel to keep all the stuff on top of the frame
         infoPanel = new JPanel();
         infoConstraint = new GridBagConstraints();
         infoConstraint.gridy = 0;
@@ -81,8 +83,10 @@ public class Screen {
         infoConstraint.anchor = GridBagConstraints.PAGE_START;
         controlContainer.add(infoPanel,infoConstraint);
 
+        //this constraint is used for all the components in the infopanel
         GridBagConstraints innerInfor = new GridBagConstraints();
 
+        //Creating and setting the field that has the number of markers
         markersNo = new JTextField();
         markersNo.setPreferredSize(new Dimension(80,30));
         markersNo.setLayout(new GridBagLayout());
@@ -90,6 +94,7 @@ public class Screen {
         innerInfor.gridx = 0;
         infoPanel.add(markersNo,innerInfor);
 
+        //Creating the new game button
         newGameB = new JButton();
         newGameB.addActionListener(new NewGameListener());
         newGameB.setPreferredSize(new Dimension(50,50));
@@ -98,15 +103,17 @@ public class Screen {
         innerInfor.gridx = 1;
         infoPanel.add(newGameB,innerInfor);
 
+        //Creating the field to show how much time has elapsed since the game started
         timeField = new JTextField();
         timeField.setPreferredSize(new Dimension(80,30));
         timeField.setLayout(new GridBagLayout());
-        timeField.setText("Time = stuff");
+        timeField.setText("Time = " + 0);
         innerInfor.gridx = 2;
         infoPanel.add(timeField,innerInfor);
 
         infoPanel.setVisible(true);
 
+        //The actual game area creation
         gamePanel = new JPanel();
         gameLayout = new GridBagLayout();
         gameConstraint = new GridBagConstraints();
@@ -115,11 +122,21 @@ public class Screen {
         gameConstraint.anchor = GridBagConstraints.CENTER;
         gameConstraint.fill = GridBagConstraints.BOTH;
         controlContainer.add(gamePanel,gameConstraint);
+
+        //Only the game and info panel are needed to be added into controlcontainer
+
+        //Make the actual game grid
         makeGrid(x,y);
-        markersNo.setText("Markers = " + GC.getNoMarkersAvail());
+
         mainFrame.setVisible(true);
     }
 
+    //For changing level from the main
+    public void changeLevel(int level){
+        GC.changeLevel(level);
+    }
+
+    //Just use to make a simple grid
     public void makeGrid(int x, int y){
         gridContraints = new GridBagConstraints();
         gridContraints.anchor = GridBagConstraints.FIRST_LINE_START;
@@ -137,6 +154,9 @@ public class Screen {
             }
         }
     }
+
+    //Make grid using the grid from the GC
+    //This is used after the first click and the game has started
     public void makeGrid(Cell[][] actualGrid){
         gamePanel.removeAll();
         gamePanel.setVisible(false);
@@ -156,6 +176,7 @@ public class Screen {
         gamePanel.setVisible(true);
     }
 
+    //For all cell in the board that is not started yet
     private class FirstButtonClickListener implements ActionListener{
         public void actionPerformed(ActionEvent e){
             if(!GameControl.firstClick){
@@ -180,16 +201,18 @@ public class Screen {
                     buttons[i[0]][i[1]].reveal();
                 }
                 System.out.println("Done");
-
+                timeThread.start();
             }
         }
     }
+
+    //For the new game button, reset the board
     private class NewGameListener implements ActionListener{
         public void actionPerformed(ActionEvent e){
             if(GameControl.firstClick){
                 GameControl.firstClick = false;
                 System.out.println("Resetting.....  ");
-                GC = new GameControl();
+                GC = new GameControl(GC.getGridX(),GC.getGridY(),GC.getNumberOfBombs());
                 gamePanel.removeAll();
                 gamePanel.setVisible(false);
                 makeGrid(GC.getGridX(),GC.getGridY());
@@ -197,10 +220,14 @@ public class Screen {
                 gamePanel.setVisible(true);
                 System.out.println("Done");
                 markersNo.setText("Markers = " + GC.getNoMarkersAvail());
+                timeThread.stop();
+                timeField.setText("Time = " + 0);
             }
 
         }
     }
+
+    //Class listener to all buttons after the first click
     private class GameControlMarkListener implements MouseListener {
         public void mouseClicked(MouseEvent arg0){
             if(SwingUtilities.isRightMouseButton(arg0)){
@@ -224,7 +251,8 @@ public class Screen {
     }
 
 
-
+    //Attached this to all empty after the first click
+    //This would do the same work as the first click
     private class GameControlEmptyListener implements MouseListener{
         public void mouseClicked(MouseEvent arg0){
             if(SwingUtilities.isLeftMouseButton(arg0)){
@@ -246,4 +274,69 @@ public class Screen {
         public void mouseExited(MouseEvent arg0){}
         public void mousePressed(MouseEvent arg0){}
     }
+
+    //This is the class that create another thread and let it count the time
+    private class TimeThread implements Runnable {
+        Thread t;
+        double timeStart;
+        double timePrevious;
+        double timeCurrent;
+        int timePassed;
+        boolean gameStarted;
+        String name;
+
+        //Abit of contructor
+        public TimeThread(String name){
+            gameStarted = false;
+            this.name = name;
+        }
+        //Main running loop
+        public void run(){
+            timeStart = 0;
+            timeCurrent = 0;
+            timePassed = 0;
+            timePrevious = 0;
+            timeStart = System.nanoTime();
+            while (gameStarted){
+                timeCurrent = System.nanoTime();
+                timePassed = (int) ((timeCurrent - timeStart)/1000000000.0);
+                timeField.setText("Time = " + timePassed);
+                try{
+                    Thread.sleep(500);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+        //Always start the class with start() because it will create a new thread and properly start it
+        public void start(){
+            toggleGameStarted();
+            t = new Thread(this,name);
+            t.start();
+        }
+
+        //Getter methods
+        public int getTime(){
+            return timePassed;
+        }
+        public boolean getGameStarted(){
+            return gameStarted;
+        }
+        //Setter methods
+        //Use this to toggle from outside
+        public void stop(){
+            toggleGameStarted();
+        }
+        //A setter that is used to toggle gameStarted
+        public void toggleGameStarted(){
+            if(gameStarted){
+                gameStarted = false;
+            }
+            else{
+                gameStarted = true;
+            }
+        }
+
+    }
+
 }

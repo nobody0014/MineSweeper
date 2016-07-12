@@ -39,7 +39,18 @@ public class GameControl {
         revealedArea = new HashSet<>();
         isGameOver = false;
     }
-
+    public GameControl(int x, int y, int bombs){
+        this.x = x;
+        this.y = y;
+        noBombs = bombs;
+        noMarkersAvail = bombs;
+        noBombsMarked = 0;
+        board = new Cell[x][y];
+        bombPos = new HashSet<>();
+        positionFilled = new HashSet<>();
+        revealedArea = new HashSet<>();
+        isGameOver = false;
+    }
 
     public void changeLevel(int lvl){
         //0 is the Height
@@ -63,12 +74,14 @@ public class GameControl {
             noBombs = 99;
             noMarkersAvail = 99;
         }
+        board = new Cell[x][y];
     }
     public void changeLevel(int x, int y, int bombs){
         this.x = x;
         this.y = y;
         noBombs = bombs;
         noMarkersAvail = bombs;
+        board = new Cell[x][y];
     }
 
     public void setUpBoard(int[] firstClickPos){
