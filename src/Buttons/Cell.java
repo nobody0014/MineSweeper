@@ -10,15 +10,44 @@ public class Cell extends JButton {
     CellListerner cellListen;
     int[] pos;
     int element;
+    boolean isLeftClicked;
+    boolean isMarked;
     public Cell(int[] i){
         pos = i;
         cellListen = new CellListerner();
         addActionListener(cellListen);
         this.setPreferredSize(new Dimension(45,45));
         this.setText("");
+        isMarked = false;
+        isLeftClicked = false;
     }
+    // this reveal version is the left click version
     public void reveal(){
-        this.setText("a");
+        if(!isLeftClicked && !isMarked){
+            this.setText("a");
+            isLeftClicked = true;
+        }
+    }
+    // this overload version will make the actually place the beware sign
+    public void reveal(String s){
+        System.out.println(isLeftClicked);
+        if(!isLeftClicked && s.equals("right")){
+            if(!isMarked){
+                this.setText("M");
+                isMarked = true;
+            }
+            else if(isMarked){
+                this.setText("");
+                isMarked = false;
+            }
+        }
+    }
+
+    public boolean getIsLeftClicked(){
+        return isLeftClicked;
+    }
+    public boolean getIsMarked(){
+        return isMarked;
     }
     public int[] getPos(){
         return pos;

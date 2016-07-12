@@ -12,7 +12,10 @@ public class Number extends Cell {
         addActionListener(numListen);
     }
     public void reveal(){
-        this.setText(String.valueOf(element));
+        if(!isLeftClicked){
+            this.setText(String.valueOf(element));
+            isLeftClicked = true;
+        }
     }
     public String toString(){
         return "Number";

@@ -15,5 +15,6 @@ public class CellListerner implements ActionListener {
         System.out.println(Arrays.toString(cellClicked.getPos()));
         System.out.println("A Cell");
         cellClicked.reveal();
+
     }
 }

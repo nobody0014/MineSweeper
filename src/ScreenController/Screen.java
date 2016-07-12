@@ -7,6 +7,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -107,6 +109,10 @@ public class Screen {
         for(int i = 0; i < GC.getGridY(); i++){
             for (int j = 0; j < GC.getGridX(); j++){
                 buttons[j][i] = actualGrid[j][i];
+                if(buttons[j][i] instanceof Empty){
+                    buttons[j][i].addMouseListener(new GameControlEmptyListener());
+                }
+                buttons[j][i].addMouseListener(new GameControlMarkListener());
                 gridContraints.gridx = j;
                 gridContraints.gridy = i;
                 gamePanel.add(buttons[j][i],gridContraints);
@@ -143,5 +149,39 @@ public class Screen {
 
             }
         }
+    }
+    private class GameControlMarkListener implements MouseListener {
+        public void mouseClicked(MouseEvent arg0){
+            if(SwingUtilities.isRightMouseButton(arg0)){
+                Cell c = (Cell) arg0.getSource();
+                c.reveal("right");
+            }
+        }
+        public void mouseEntered(MouseEvent arg0){}
+        public void mouseReleased(MouseEvent arg0) {}
+        public void mouseExited(MouseEvent arg0){}
+        public void mousePressed(MouseEvent arg0){}
+    }
+
+    private class GameControlEmptyListener implements MouseListener{
+        public void mouseClicked(MouseEvent arg0){
+            if(SwingUtilities.isLeftMouseButton(arg0)){
+                Cell c = (Empty) arg0.getSource();
+                int[] pos = new int[2];
+                pos[0] = c.getPos()[0];
+                pos[1] = c.getPos()[1];
+                Set<int[]> someArea = GC.getAreaToReveal(pos, new HashSet<>());
+                someArea.add(pos);
+                for (int[] i: someArea){
+                    System.out.println(Arrays.toString(i));
+                    GC.revealedArea.add(i);
+                    buttons[i[0]][i[1]].reveal();
+                }
+            }
+        }
+        public void mouseEntered(MouseEvent arg0){}
+        public void mouseReleased(MouseEvent arg0) {}
+        public void mouseExited(MouseEvent arg0){}
+        public void mousePressed(MouseEvent arg0){}
     }
 }

@@ -230,7 +230,7 @@ public class GameControl {
             area.add(pos);
             for (int[] i: directions){
                 if(checkValidPos(i)){
-                    if(board[i[0]][i[1]] instanceof Bomb || contains(area,i)){
+                    if(board[i[0]][i[1]] instanceof Bomb || contains(revealedArea,i) || contains(area,i)){
                         continue;
                     }
                     area.add(i);
@@ -289,31 +289,5 @@ public class GameControl {
         boardString += "]";
         return boardString;
     }
-    private class GameControlBombListener implements MouseListener{
-        public void mouseEntered(MouseEvent arg0){
 
-        }
-        public void mouseReleased(MouseEvent arg0) {
-
-        }
-        public void mouseClicked(MouseEvent arg0){
-            if(SwingUtilities.isRightMouseButton(arg0)){
-            }
-            else if(SwingUtilities.isRightMouseButton(arg0)){
-
-            }
-        }
-        public void mouseExited(MouseEvent arg0){
-
-        }
-        public void mousePressed(MouseEvent arg0){
-
-        }
-
-    }
-    private class GameControlEmptyListener implements ActionListener{
-        public void actionPerformed(ActionEvent e){
-
-        }
-    }
 }
