@@ -10,11 +10,12 @@ public class Bomb extends Cell {
         bombListen = new BombListener();
         addActionListener(bombListen);
     }
-    public void reveal(){
+    public int reveal(){
         if(!isLeftClicked && !isMarked){
             this.setText("B");
             isLeftClicked = true;
         }
+        return 0;
     }
     public String toString(){
         return "Bomb";

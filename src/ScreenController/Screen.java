@@ -4,6 +4,7 @@ import Buttons.*;
 import GameController.GameControl;
 
 import javax.swing.*;
+import javax.swing.plaf.DimensionUIResource;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,6 +31,9 @@ public class Screen {
     private GridBagConstraints gameConstraint;
     private JMenuBar menuBar;
     private JMenu menu;
+    private JButton newGameB;
+    private JTextField markersNo;
+    private JTextField timeField;
     private Cell buttons[][];
     private GameControl GC;
 
@@ -46,7 +50,12 @@ public class Screen {
         menu = new JMenu("A Menu");
         menuBar.add(menu);
         mainFrame = new JFrame("Main");
-        mainFrame.setSize(x * 45 + 25,200 + y*45);
+        if(x*45 > 450){
+            mainFrame.setSize(x * 45 + 25, 150 + y*45);
+        }
+        else{
+            mainFrame.setSize(450, 150 + y*45);
+        }
         //Add constant to Y dimension to give area for restart, timer, and number of bombs
 
         //Get X and Y locations where you can start the screen in the middle
@@ -64,25 +73,50 @@ public class Screen {
         controlLayout = new GridBagLayout();
         controlContainer.setLayout(controlLayout);
 
+
         infoPanel = new JPanel();
-        infoPanel.add(new JLabel("h"));
         infoConstraint = new GridBagConstraints();
-        infoConstraint.gridx = 0;
         infoConstraint.gridy = 0;
+        infoConstraint.fill = GridBagConstraints.HORIZONTAL;
         infoConstraint.anchor = GridBagConstraints.PAGE_START;
         controlContainer.add(infoPanel,infoConstraint);
+
+        GridBagConstraints innerInfor = new GridBagConstraints();
+
+        markersNo = new JTextField();
+        markersNo.setPreferredSize(new Dimension(80,30));
+        markersNo.setLayout(new GridBagLayout());
+        markersNo.setText("Markers = " + GC.getNoMarkersAvail());
+        innerInfor.gridx = 0;
+        infoPanel.add(markersNo,innerInfor);
+
+        newGameB = new JButton();
+        newGameB.addActionListener(new NewGameListener());
+        newGameB.setPreferredSize(new Dimension(50,50));
+        newGameB.setText("NG");
+        newGameB.setLayout(new GridBagLayout());
+        innerInfor.gridx = 1;
+        infoPanel.add(newGameB,innerInfor);
+
+        timeField = new JTextField();
+        timeField.setPreferredSize(new Dimension(80,30));
+        timeField.setLayout(new GridBagLayout());
+        timeField.setText("Time = stuff");
+        innerInfor.gridx = 2;
+        infoPanel.add(timeField,innerInfor);
+
         infoPanel.setVisible(true);
 
         gamePanel = new JPanel();
         gameLayout = new GridBagLayout();
         gameConstraint = new GridBagConstraints();
         gamePanel.setLayout(gameLayout);
-        gameConstraint.gridx = 0;
         gameConstraint.gridy = 1;
         gameConstraint.anchor = GridBagConstraints.CENTER;
         gameConstraint.fill = GridBagConstraints.BOTH;
         controlContainer.add(gamePanel,gameConstraint);
         makeGrid(x,y);
+        markersNo.setText("Markers = " + GC.getNoMarkersAvail());
         mainFrame.setVisible(true);
     }
 
@@ -150,11 +184,37 @@ public class Screen {
             }
         }
     }
+    private class NewGameListener implements ActionListener{
+        public void actionPerformed(ActionEvent e){
+            if(GameControl.firstClick){
+                GameControl.firstClick = false;
+                System.out.println("Resetting.....  ");
+                GC = new GameControl();
+                gamePanel.removeAll();
+                gamePanel.setVisible(false);
+                makeGrid(GC.getGridX(),GC.getGridY());
+                controlContainer.add(gamePanel,gameConstraint);
+                gamePanel.setVisible(true);
+                System.out.println("Done");
+                markersNo.setText("Markers = " + GC.getNoMarkersAvail());
+            }
+
+        }
+    }
     private class GameControlMarkListener implements MouseListener {
         public void mouseClicked(MouseEvent arg0){
             if(SwingUtilities.isRightMouseButton(arg0)){
                 Cell c = (Cell) arg0.getSource();
-                c.reveal("right");
+                int result = c.reveal("right");
+                if(result == 1){
+                    GC.addNoBombsMarked();
+                    GC.minusNoMarkersAvail();
+                }
+                else if(result == -1){
+                    GC.minusNoBombsMarked();
+                    GC.addNoMarkersAvail();
+                }
+                markersNo.setText("Markers = " + GC.getNoMarkersAvail());
             }
         }
         public void mouseEntered(MouseEvent arg0){}
@@ -162,6 +222,8 @@ public class Screen {
         public void mouseExited(MouseEvent arg0){}
         public void mousePressed(MouseEvent arg0){}
     }
+
+
 
     private class GameControlEmptyListener implements MouseListener{
         public void mouseClicked(MouseEvent arg0){

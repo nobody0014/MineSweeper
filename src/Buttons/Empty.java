@@ -10,11 +10,12 @@ public class Empty extends Number {
         emptListen = new EmptyListener();
         addActionListener(emptListen);
     }
-    public void reveal(){
+    public int reveal(){
         if(!isLeftClicked){
             this.setText("E");
             isLeftClicked = true;
         }
+        return 0;
     }
     public String toString(){
         return "Empty";

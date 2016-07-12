@@ -23,12 +23,16 @@ public class GameControl {
     private int x;
     private int y;
     private int noBombs;
+    private int noMarkersAvail;
+    private int noBombsMarked;
     private boolean isGameOver;
 
     public GameControl(){
         x = 9;
         y = 9;
         noBombs = 10;
+        noMarkersAvail = 10;
+        noBombsMarked = 0;
         board = new Cell[x][y];
         bombPos = new HashSet<>();
         positionFilled = new HashSet<>();
@@ -45,22 +49,26 @@ public class GameControl {
             x = 9;
             y = 9;
             noBombs = 10;
+            noMarkersAvail = 10;
         }
         else if(lvl == 2){
             x = 16;
             y = 16;
             noBombs = 40;
+            noMarkersAvail = 40;
         }
         else if(lvl == 3){
             x = 30;
             y = 16;
             noBombs = 99;
+            noMarkersAvail = 99;
         }
     }
     public void changeLevel(int x, int y, int bombs){
         this.x = x;
         this.y = y;
         noBombs = bombs;
+        noMarkersAvail = bombs;
     }
 
     public void setUpBoard(int[] firstClickPos){
@@ -247,24 +255,40 @@ public class GameControl {
             return area;
         }
     }
+    //Some getter methods for only a few necessary variables
+    public void addNoBombsMarked(){noBombsMarked++;}
+    public void minusNoBombsMarked(){noBombsMarked--;}
+    public void addNoMarkersAvail(){ noMarkersAvail++;}
+    public void minusNoMarkersAvail(){ noMarkersAvail--;}
+
 
     //Getter methods start here
     //Get the board back but not the string part.
     public Cell[][] getBoard(){
         return board;
     }
+
     //Get Height
     public int getGridY(){
         return y;
     }
+
     //Get Width
     public int  getGridX(){
         return x;
     }
+
     //Get NumberOfBombs
     public int getNumberOfBombs(){
         return noBombs;
     }
+
+    //Get no of bombs that are marked
+    public int getNoBombsMarked(){ return noBombsMarked;}
+
+    //Get no of markers that are available
+    public int getNoMarkersAvail(){ return noMarkersAvail;}
+
     //Get the state of the board (in string form).
     public String boardString(){
         String boardString = "[";
