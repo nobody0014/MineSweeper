@@ -7,19 +7,17 @@ import java.awt.*;
  * Created by wit on 7/5/2016.
  */
 public class Cell extends JButton {
-    CellListerner cellListen;
     int[] pos;
     int element;
     boolean isLeftClicked;
     boolean isMarked;
     public Cell(int[] i){
         pos = i;
-        cellListen = new CellListerner();
-        addActionListener(cellListen);
         this.setPreferredSize(new Dimension(45,45));
         this.setText("");
         isMarked = false;
         isLeftClicked = false;
+        this.setBackground(Color.CYAN);
     }
     // this reveal version is the left click version
     public int reveal(){
@@ -35,17 +33,18 @@ public class Cell extends JButton {
             if(!isMarked){
                 this.setText("M");
                 isMarked = true;
+                this.setBackground(Color.YELLOW);
                 return 1;
             }
             else if(isMarked){
                 this.setText("");
+                this.setBackground(Color.CYAN);
                 isMarked = false;
                 return -1;
             }
         }
         return 0;
     }
-
     public boolean getIsLeftClicked(){
         return isLeftClicked;
     }

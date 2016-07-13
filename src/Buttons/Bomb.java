@@ -1,19 +1,24 @@
 package Buttons;
 
+import GameController.GameControl;
+
+import javax.crypto.Cipher;
+import java.awt.*;
+
 /**
  * Created by wit on 7/5/2016.
  */
 public class Bomb extends Cell {
-    BombListener bombListen;
     public Bomb(int[] i){
         super(i);
-        bombListen = new BombListener();
-        addActionListener(bombListen);
     }
     public int reveal(){
-        if(!isLeftClicked && !isMarked){
+        if((!isLeftClicked && !isMarked) || GameControl.gameOver){
             this.setText("B");
             isLeftClicked = true;
+            this.setBackground(Color.RED);
+            this.setEnabled(false);
+            GameControl.gameOver = true;
         }
         return 0;
     }

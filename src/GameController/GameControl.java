@@ -15,6 +15,7 @@ import java.util.*;
  */
 public class GameControl {
     public static boolean firstClick = false;
+    public static boolean gameOver = false;
     public HashSet<int[]> revealedArea;
     private Cell[][] board;
     private HashSet<int[]> bombPos;
@@ -25,7 +26,6 @@ public class GameControl {
     private int noBombs;
     private int noMarkersAvail;
     private int noBombsMarked;
-    private boolean isGameOver;
 
     public GameControl(){
         x = 9;
@@ -37,7 +37,6 @@ public class GameControl {
         bombPos = new HashSet<>();
         positionFilled = new HashSet<>();
         revealedArea = new HashSet<>();
-        isGameOver = false;
     }
     public GameControl(int x, int y, int bombs){
         this.x = x;
@@ -49,7 +48,6 @@ public class GameControl {
         bombPos = new HashSet<>();
         positionFilled = new HashSet<>();
         revealedArea = new HashSet<>();
-        isGameOver = false;
     }
 
     public void changeLevel(int lvl){
@@ -242,6 +240,9 @@ public class GameControl {
         allPos.add(r);
         return  allPos;
     }
+
+
+
     public Set<int[]> getAreaToReveal(int [] pos, Set<int[]> area){
         if(!checkValidPos(pos)){
             return area;

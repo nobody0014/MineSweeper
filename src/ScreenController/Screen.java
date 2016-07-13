@@ -165,8 +165,16 @@ public class Screen {
                 buttons[j][i] = actualGrid[j][i];
                 if(buttons[j][i] instanceof Empty){
                     buttons[j][i].addMouseListener(new GameControlEmptyListener());
+                    buttons[j][i].addActionListener(new CellListener());
+                }
+                else if(buttons[j][i] instanceof Bomb){
+                    buttons[j][i].addActionListener(new BombListener());
+                }
+                else{
+                    buttons[j][i].addActionListener(new CellListener());
                 }
                 buttons[j][i].addMouseListener(new GameControlMarkListener());
+
                 gridContraints.gridx = j;
                 gridContraints.gridy = i;
                 gamePanel.add(buttons[j][i],gridContraints);
@@ -211,6 +219,7 @@ public class Screen {
         public void actionPerformed(ActionEvent e){
             if(GameControl.firstClick){
                 GameControl.firstClick = false;
+                GameControl.gameOver = false;
                 System.out.println("Resetting.....  ");
                 GC = new GameControl(GC.getGridX(),GC.getGridY(),GC.getNumberOfBombs());
                 gamePanel.removeAll();
@@ -227,6 +236,45 @@ public class Screen {
         }
     }
 
+    //This listener is given to the most cell except bomb
+    private class CellListener implements ActionListener {
+        Cell cellClicked;
+        public void actionPerformed(ActionEvent e){
+            cellClicked = (Cell) e.getSource();
+            System.out.println(Arrays.toString(cellClicked.getPos()));
+            System.out.println("A Cell");
+            cellClicked.reveal();
+        }
+    }
+    private class BombListener implements  ActionListener{
+        Bomb cellClicked;
+        public void actionPerformed(ActionEvent e){
+            cellClicked = (Bomb) e.getSource();
+            System.out.println(Arrays.toString(cellClicked.getPos()));
+            System.out.println("A Cell");
+            cellClicked.reveal();
+            if(GameControl.gameOver){
+                timeThread.stop();
+                Cell[][] board = GC.getBoard();
+                for(int i = 0; i < GC.getGridY(); i++){
+                    for (int j = 0; j < GC.getGridX(); j++){
+                        //If it is a not bomb and marked, reveal and set background to show that it is wrong
+                        if(board[j][i].getIsMarked() && !(board[j][i] instanceof Bomb)){
+                            board[j][i].setText("");
+                            board[j][i].reveal();
+                            board[j][i].setBackground(Color.MAGENTA);
+
+                        }
+                        else if(!board[j][i].getIsMarked()){ //reveal everything that is not marked
+                            board[j][i].reveal();
+                        }
+                        //inefficient way of doing things i know, im just too lazy to change stuff
+                        board[j][i].setEnabled(false);
+                    }
+                }
+            }
+        }
+    }
     //Class listener to all buttons after the first click
     private class GameControlMarkListener implements MouseListener {
         public void mouseClicked(MouseEvent arg0){

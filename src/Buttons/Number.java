@@ -1,20 +1,44 @@
 package Buttons;
 
+import GameController.GameControl;
+
+import javax.swing.*;
+import java.awt.*;
+
 /**
  * Created by wit on 7/5/2016.
  */
 public class Number extends Cell {
-    NumberListener numListen;
+    //need this because when the button is set disabled, its text become grey out, so we creat container inside
+    JLabel numberLabel;
     public Number(int[] i,int noBombs){
         super(i);
         element = noBombs;
-        numListen = new NumberListener();
-        addActionListener(numListen);
+        numberLabel = new JLabel();
+        numberLabel.setBackground(Color.CYAN);
+        this.add(numberLabel);
     }
     public int reveal(){
-        if(!isLeftClicked){
-            this.setText(String.valueOf(element));
+        if((!isLeftClicked && !isMarked) || GameControl.gameOver){
+            numberLabel.setText(String.valueOf(element));
             isLeftClicked = true;
+            if(this.element == 1){
+                numberLabel.setForeground(Color.BLACK);
+            }
+            else if(this.element == 2){
+                numberLabel.setForeground(Color.YELLOW);
+            }
+            else if(this.element == 3){
+                numberLabel.setForeground(Color.RED);
+            }
+            else if(this.element == 4){
+                numberLabel.setForeground(Color.BLUE);
+            }
+            else if(this.element == 5){
+                numberLabel.setForeground(Color.MAGENTA);
+            }
+            this.setEnabled(false);
+            numberLabel.setEnabled(true);
         }
         return 0;
     }
