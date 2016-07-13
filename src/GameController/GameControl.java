@@ -26,8 +26,10 @@ public class GameControl {
     private int noBombs;
     private int noMarkersAvail;
     private int noBombsMarked;
+    private int level;
 
     public GameControl(){
+        level = 1;
         x = 9;
         y = 9;
         noBombs = 10;
@@ -39,6 +41,7 @@ public class GameControl {
         revealedArea = new HashSet<>();
     }
     public GameControl(int x, int y, int bombs){
+        level = 0; //Custom make level become 0
         this.x = x;
         this.y = y;
         noBombs = bombs;
@@ -55,18 +58,21 @@ public class GameControl {
         //1 is the Width
         //2 is the number of bombs
         if(lvl == 1){
+            level = lvl;
             x = 9;
             y = 9;
             noBombs = 10;
             noMarkersAvail = 10;
         }
         else if(lvl == 2){
+            level = lvl;
             x = 16;
             y = 16;
             noBombs = 40;
             noMarkersAvail = 40;
         }
         else if(lvl == 3){
+            level = lvl;
             x = 30;
             y = 16;
             noBombs = 99;
@@ -274,6 +280,14 @@ public class GameControl {
     public void minusNoBombsMarked(){noBombsMarked--;}
     public void addNoMarkersAvail(){ noMarkersAvail++;}
     public void minusNoMarkersAvail(){ noMarkersAvail--;}
+    public void setLevel(int lvl){
+        if(lvl > 3 || lvl < 1){
+            System.out.println("Invalid preset level");
+        }
+        else{
+            changeLevel(lvl);
+        }
+    }
 
 
     //Getter methods start here
@@ -302,6 +316,9 @@ public class GameControl {
 
     //Get no of markers that are available
     public int getNoMarkersAvail(){ return noMarkersAvail;}
+
+    //Get level
+    public int getLevel(){ return level;}
 
     //Get the state of the board (in string form).
     public String boardString(){

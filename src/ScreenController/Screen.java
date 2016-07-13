@@ -34,6 +34,12 @@ public class Screen {
     private JTextField timeField;
     private Cell buttons[][];
     private GameControl GC;
+    private JMenuItem changeLevel1;
+    private JMenuItem changeLevel2;
+    private JMenuItem changeLevel3;
+    private Toolkit tk;
+    private Dimension dim;
+
 
 
     public Screen(){
@@ -43,32 +49,25 @@ public class Screen {
     public void makeScreen(){
         int x = GC.getGridX();
         int y = GC.getGridY();
-        Toolkit tk =  Toolkit.getDefaultToolkit();
-        Dimension dim = tk.getScreenSize();
+        tk =  Toolkit.getDefaultToolkit();
+        dim = tk.getScreenSize();
 
-        menuBar = new JMenuBar();
-        menuBar.setBorderPainted(true);
-        menu = new JMenu("A Menu");
-        menuBar.add(menu);
         mainFrame = new JFrame("Main");
 
-        //Just in case that the x is not wide enough to contain all information
-        if(x*45 > 450){
-            mainFrame.setSize(x * 45 + 25, 150 + y*45);
-        }
-        else{
-            mainFrame.setSize(450, 150 + y*45);
-        }
 
-        //Get X and Y locations where you can start the screen in the middle
-        int midX =  dim.width/2 - mainFrame.getWidth()/2;
-        int midY = dim.height/2 - mainFrame.getHeight()/2;
+        //Call resize frame to set size for you
+        resizeFrame();
+
+        //Set up menuBar and add its item
+        setUpMenu();
         mainFrame.setJMenuBar(menuBar);
 
+        
         //Set some screen properties
-        mainFrame.setLocation(midX,midY);
+        centerTheFrame();
         mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         mainFrame.setResizable(false);
+
 
         controlContainer = mainFrame.getContentPane();
         controlContainer.setSize(mainFrame.getWidth(),mainFrame.getHeight());
@@ -131,6 +130,49 @@ public class Screen {
         mainFrame.setVisible(true);
     }
 
+    public void setUpMenu(){
+        menuBar = new JMenuBar();
+        menuBar.setBorderPainted(true);
+        menu = new JMenu("Change Level");
+
+        //Changing to level one
+        changeLevel1 = new JMenuItem();
+        changeLevel1.setText("Level 1");
+        changeLevel1.addActionListener(new ChangeLevelListener(1));
+
+        changeLevel2 = new JMenuItem();
+        changeLevel2.setText("Level 2");
+        changeLevel2.addActionListener(new ChangeLevelListener(2));
+
+        changeLevel3 = new JMenuItem();
+        changeLevel3.setText("Level 3");
+        changeLevel3.addActionListener(new ChangeLevelListener(3));
+        PopupMenu customMenu = new PopupMenu();
+
+        menu.add(changeLevel1);
+        menu.add(changeLevel2);
+        menu.add(changeLevel3);
+//        menu.add(customMenu);
+        menuBar.add(menu);
+    }
+
+    public void centerTheFrame(){
+        //Get mid location according to its current width and height
+        int midX =  dim.width/2 - mainFrame.getWidth()/2;
+        int midY = dim.height/2 - mainFrame.getHeight()/2;
+        //Set some screen properties
+        mainFrame.setLocation(midX,midY);
+    }
+
+    public void resizeFrame(){
+        if(GC.getGridX()*45 > 450){
+            mainFrame.setSize(GC.getGridX() * 45 + 25, 150 + GC.getGridY()*45);
+        }
+        else{
+            mainFrame.setSize(450, 150 + GC.getGridY()*45);
+        }
+    }
+
     //For changing level from the main
     public void changeLevel(int level){
         GC.changeLevel(level);
@@ -184,6 +226,50 @@ public class Screen {
         gamePanel.setVisible(true);
     }
 
+
+    public void newGame(){
+        GameControl.firstClick = false;
+        GameControl.gameOver = false;
+        System.out.println("Resetting.....  ");
+        GC = new GameControl(GC.getGridX(),GC.getGridY(),GC.getNumberOfBombs());
+        gamePanel.removeAll();
+        gamePanel.setVisible(false);
+        makeGrid(GC.getGridX(),GC.getGridY());
+        controlContainer.add(gamePanel,gameConstraint);
+        gamePanel.setVisible(true);
+        System.out.println("Done");
+        markersNo.setText("Markers = " + GC.getNoMarkersAvail());
+        timeThread.stop();
+        timeField.setText("Time = " + 0);
+    }
+
+    //Overloaded method for changing level
+    public void newGame(int level){
+        GC.changeLevel(level);
+        GameControl.firstClick = false;
+        GameControl.gameOver = false;
+        System.out.println("Resetting.....  ");
+        GC = new GameControl(GC.getGridX(),GC.getGridY(),GC.getNumberOfBombs());
+        gamePanel.removeAll();
+        gamePanel.setVisible(false);
+        makeGrid(GC.getGridX(),GC.getGridY());
+        controlContainer.add(gamePanel,gameConstraint);
+        gamePanel.setVisible(true);
+        System.out.println("Done");
+        markersNo.setText("Markers = " + GC.getNoMarkersAvail());
+        timeThread.stop();
+        timeField.setText("Time = " + 0);
+    }
+
+
+
+
+
+    //Start of Inner classes (The end is thread)
+
+
+
+
     //For all cell in the board that is not started yet
     private class FirstButtonClickListener implements ActionListener{
         public void actionPerformed(ActionEvent e){
@@ -218,21 +304,8 @@ public class Screen {
     private class NewGameListener implements ActionListener{
         public void actionPerformed(ActionEvent e){
             if(GameControl.firstClick){
-                GameControl.firstClick = false;
-                GameControl.gameOver = false;
-                System.out.println("Resetting.....  ");
-                GC = new GameControl(GC.getGridX(),GC.getGridY(),GC.getNumberOfBombs());
-                gamePanel.removeAll();
-                gamePanel.setVisible(false);
-                makeGrid(GC.getGridX(),GC.getGridY());
-                controlContainer.add(gamePanel,gameConstraint);
-                gamePanel.setVisible(true);
-                System.out.println("Done");
-                markersNo.setText("Markers = " + GC.getNoMarkersAvail());
-                timeThread.stop();
-                timeField.setText("Time = " + 0);
+                newGame();
             }
-
         }
     }
 
@@ -246,6 +319,8 @@ public class Screen {
             cellClicked.reveal();
         }
     }
+
+    //Put this into bomb
     private class BombListener implements  ActionListener{
         Bomb cellClicked;
         public void actionPerformed(ActionEvent e){
@@ -321,6 +396,20 @@ public class Screen {
         public void mouseReleased(MouseEvent arg0) {}
         public void mouseExited(MouseEvent arg0){}
         public void mousePressed(MouseEvent arg0){}
+    }
+
+    private class ChangeLevelListener implements ActionListener{
+        private int level;
+        public ChangeLevelListener(int level){
+            this.level = level;
+        }
+        public void actionPerformed(ActionEvent e){
+            if(GC.getLevel() != level){
+                newGame(level);
+                resizeFrame();
+                centerTheFrame();
+            }
+        }
     }
 
     //This is the class that create another thread and let it count the time
