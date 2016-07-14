@@ -15,7 +15,7 @@ public class Number extends Cell {
         super(i);
         element = noBombs;
         numberLabel = new JLabel();
-        numberLabel.setBackground(Color.CYAN);
+        numberLabel.setBackground(Color.GRAY);
         this.add(numberLabel);
     }
     public int reveal(){
@@ -26,7 +26,7 @@ public class Number extends Cell {
                 numberLabel.setForeground(Color.BLACK);
             }
             else if(this.element == 2){
-                numberLabel.setForeground(Color.YELLOW);
+                numberLabel.setForeground(Color.GREEN);
             }
             else if(this.element == 3){
                 numberLabel.setForeground(Color.RED);
@@ -37,6 +37,7 @@ public class Number extends Cell {
             else if(this.element == 5){
                 numberLabel.setForeground(Color.MAGENTA);
             }
+            this.setBackground(Color.GRAY);
             this.setEnabled(false);
             numberLabel.setEnabled(true);
         }

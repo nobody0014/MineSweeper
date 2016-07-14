@@ -17,7 +17,7 @@ public class Cell extends JButton {
         this.setText("");
         isMarked = false;
         isLeftClicked = false;
-        this.setBackground(Color.CYAN);
+        this.setBackground(Color.WHITE);
     }
     // this reveal version is the left click version
     public int reveal(){
@@ -38,7 +38,7 @@ public class Cell extends JButton {
             }
             else if(isMarked){
                 this.setText("");
-                this.setBackground(Color.CYAN);
+                this.setBackground(Color.WHITE);
                 isMarked = false;
                 return -1;
             }

@@ -62,7 +62,7 @@ public class Screen {
         setUpMenu();
         mainFrame.setJMenuBar(menuBar);
 
-        
+
         //Set some screen properties
         centerTheFrame();
         mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -120,6 +120,7 @@ public class Screen {
         gameConstraint.gridy = 1;
         gameConstraint.anchor = GridBagConstraints.CENTER;
         gameConstraint.fill = GridBagConstraints.BOTH;
+//        gameConstraint.ipady = GC.getGridY()*45;
         controlContainer.add(gamePanel,gameConstraint);
 
         //Only the game and info panel are needed to be added into controlcontainer
@@ -183,6 +184,7 @@ public class Screen {
         gridContraints = new GridBagConstraints();
         gridContraints.anchor = GridBagConstraints.FIRST_LINE_START;
         buttons = new Cell[x][y];
+//        gamePanel.p
         for(int i = 0; i < y; i++){
             for (int j = 0; j < x; j++){
                 int[] pos = new int[2];
@@ -193,6 +195,7 @@ public class Screen {
                 gridContraints.gridy = i;
                 buttons[j][i].addActionListener(new FirstButtonClickListener());
                 gamePanel.add(buttons[j][i],gridContraints);
+//                gamePanel.paintImmediately(new Rectangle(j,i,40,40));
             }
         }
     }
@@ -246,19 +249,7 @@ public class Screen {
     //Overloaded method for changing level
     public void newGame(int level){
         GC.changeLevel(level);
-        GameControl.firstClick = false;
-        GameControl.gameOver = false;
-        System.out.println("Resetting.....  ");
-        GC = new GameControl(GC.getGridX(),GC.getGridY(),GC.getNumberOfBombs());
-        gamePanel.removeAll();
-        gamePanel.setVisible(false);
-        makeGrid(GC.getGridX(),GC.getGridY());
-        controlContainer.add(gamePanel,gameConstraint);
-        gamePanel.setVisible(true);
-        System.out.println("Done");
-        markersNo.setText("Markers = " + GC.getNoMarkersAvail());
-        timeThread.stop();
-        timeField.setText("Time = " + 0);
+        newGame();
     }
 
 
@@ -378,6 +369,15 @@ public class Screen {
     //This would do the same work as the first click
     private class GameControlEmptyListener implements MouseListener{
         public void mouseClicked(MouseEvent arg0){
+            revealArea(arg0);
+        }
+        public void mouseEntered(MouseEvent arg0){}
+        public void mouseReleased(MouseEvent arg0) {
+            revealArea(arg0);
+        }
+        public void mouseExited(MouseEvent arg0){}
+        public void mousePressed(MouseEvent arg0){}
+        public void revealArea(MouseEvent arg0){
             if(SwingUtilities.isLeftMouseButton(arg0)){
                 Cell c = (Empty) arg0.getSource();
                 int[] pos = new int[2];
@@ -392,12 +392,10 @@ public class Screen {
                 }
             }
         }
-        public void mouseEntered(MouseEvent arg0){}
-        public void mouseReleased(MouseEvent arg0) {}
-        public void mouseExited(MouseEvent arg0){}
-        public void mousePressed(MouseEvent arg0){}
     }
 
+
+    //For the menu
     private class ChangeLevelListener implements ActionListener{
         private int level;
         public ChangeLevelListener(int level){
